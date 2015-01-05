@@ -88,11 +88,11 @@ class Chassis(rk4.RK4):
 
         return f_dot
 
-    def list_deriv_vars(self): 
-        return ('engine_torque',),('acceleration', 'm_dot')
+    # def list_deriv_vars(self): 
+    #     return ('engine_torque',),('acceleration', 'm_dot')
 
-    def provideJ(self): 
-        pass
+    # def provideJ(self): 
+    #     pass
 
     # def apply_deriv(self, arg, result): 
         
