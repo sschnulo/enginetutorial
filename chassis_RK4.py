@@ -36,14 +36,16 @@ class Chassis(rk4.RK4):
     #state variables
     state = Array([], iotype="out")
     #initial mass of vehicle (kg) and velocity (m/s)
-    state_init = Array([1400, 0], iotype="in")
+    state_init = Array([200, 0], iotype="in")
 
     #external variables
     t = Array([], iotype="in")
     torque_ratio = Array([], iotype='in', 
                          desc='Ratio of output torque to engine torque')
     engine_torque = Array([], iotype='in', units='N*m', 
-                            desc='Torque at wheels')        
+                            desc='Torque at wheels') 
+    fuel_burn = Array([], iotype='in', units='L/s', 
+                           desc='Fuel Burn Rate')      
 
     def __init__(self, h = 4, end_time=764):
 
@@ -59,11 +61,12 @@ class Chassis(rk4.RK4):
 
         self.state_var = 'state'
         self.init_state_var = 'state_init'
-        self.external_vars=['t', 'torque_ratio', 'engine_torque']
+        self.external_vars=['t', 'torque_ratio', 'engine_torque', 'fuel_burn']
 
     def f_dot(self, external, state):
 
-        mass = state[0]
+        engine_mass = state[0]
+        mass = engine_mass + 1200
         V = state[1]
         t = external[0]
         torque_ratio = external[1]
@@ -81,8 +84,7 @@ class Chassis(rk4.RK4):
         
         #acceleration = (torque/tire_radius - sign_V*(friction +drag))/mass
         acceleration = (torque/tire_radius)/mass
-        m_dot = -0.001*t  #fuel burn rate (kg/s)
-
+        m_dot = -external[3]*t  #fuel burn rate (kg/s)
         f_dot = np.array([m_dot, acceleration])
 
 
@@ -120,7 +122,7 @@ if __name__ == '__main__':
     
 
     import matplotlib.pyplot as plt
-    plt.plot(trial.t, trial.state[0])
+    plt.plot(trial.t, trial.mass)
     plt.title('mass vs time')
     plt.xlabel('time (s)')
     plt.ylabel('mass (kg)')

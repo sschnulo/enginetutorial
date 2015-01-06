@@ -11,18 +11,22 @@ import rk4
 from openmdao.lib.drivers.api import SLSQPdriver, NewtonSolver
 
 from chassis_RK4 import Chassis
-from error import Error 
+from error import Error
+from engine import Engine 
 
 class System(Assembly):
 
      def configure(self):
         self.add('chassis', Chassis())
         self.add('error', Error())
+        self.add('engine', Engine())
         
         self.connect('chassis.state[1]', 'error.current_speed')
+        self.connect('engine.fuel_burn', 'chassis.fuel_burn')
+        self.connect('engine.torque', 'chassis.engine_torque')
         self.add('driver', SLSQPdriver())
         self.driver.add_objective('error.norm')
-        self.driver.add_parameter('chassis.engine_torque', -500, 500)
+        self.driver.add_parameter('engine.RPM', -5000, 5000)
         # self.add('driver', NewtonSolver())
         #self.driver.add_constraint('error.error=0')
         
