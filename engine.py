@@ -114,15 +114,27 @@ class Engine(Component):
         
         #Check engine speed to see if it goes beyond our bounds:
         
-        if self.RPM[0] > 6000:
-            self.overspeed[0] = True
-        else:
-            self.overspeed[0] = False
+        # if self.RPM[0] > 6000:
+        #     self.overspeed[0] = True
+        # else:
+        #     self.overspeed[0] = False
 
-        if self.RPM[0] < 1000:
-            self.underspeed[0] = True
-        else:
-            self.underspeed[0] = False
+        idx = np.where(self.RPM > 6000)
+        self.overspeed[idx] = True
+
+        idx = np.where(self.RPM <= 6000)
+        self.overspeed[idx] = False
+
+        # if self.RPM[0] < 1000:
+        #     self.underspeed[0] = True
+        # else:
+        #     self.underspeed[0] = False
+
+        idx = np.where(self.RPM < 1000)
+        self.underspeed[idx] = True
+
+        idx = np.where(self.RPM >= 1000)
+        self.underspeed[idx] = False
             
         # These Constants are all hard-coded for Gasoline.
         # Eventually, we'll move them to the input so that they can be tweaked.
@@ -141,7 +153,7 @@ class Engine(Component):
         mw_air = 28.97         # Molecular Weight of Air (g/mol)
         mw_fuel = 114          # Molecular Weight of Gasoline (g/mol)
 
-        thetastep = 1.0        # Simulation time stepsize (crank angle degrees)
+        thetastep = 4.0        # Simulation time stepsize (crank angle degrees)
 
         # Convert mm to m
         stroke = self.stroke*.001
@@ -317,15 +329,31 @@ class Engine(Component):
                 # Note 5.5 is a fudge factor that still needs investigation.
                 Pratio = (P+5.5*Pmix)/P0
 
-                # Pratio>1 means outflow
-                if Pratio > 1:
-                    Pratio = 1.0/Pratio
-                    flow_direction = -1.0
-                else:
-                    flow_direction = 1.0
 
-                if Pratio < Pratio_crit:
-                    Pratio = Pratio_crit
+             # Pratio>1 means outflow
+                flow_direction = np.ones(len(self.t))
+
+                idx = np.where(Pratio > 1.0)
+                Pratio[idx] = 1.0/Pratio[idx]
+
+                # idx = np.where(Pratio > 1.0)
+                # flow_direction[idx] = -1.0 
+
+                # idx = np.where(Pratio <= 1.0)
+                # flow_direction[idx] = 1.0
+                # if Pratio > 1:
+                #     Pratio = 1.0/Pratio
+                #     flow_direction = -1.0
+                # else:
+                #     flow_direction = 1.0
+
+                
+
+                idx = np.where(Pratio>Pratio_crit)
+                Pratio[idx] = Pratio_crit
+
+                # if Pratio < Pratio_crit:
+                #     Pratio = Pratio_crit
                 
                 #--------------------------------------------------------------
                 # Calculate Intake Mass Flow

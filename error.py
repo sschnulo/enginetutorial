@@ -19,7 +19,7 @@ profile = np.genfromtxt('EPA-highway.csv',delimiter=',')
 
 
 # profile = np.genfromtxt('EPA-city.csv',delimiter=',')
-# t = 1875
+# t = 
 
 time = np.hstack(([0],profile[:,0]))
 speed = np.hstack(([0],profile[:,1]))
