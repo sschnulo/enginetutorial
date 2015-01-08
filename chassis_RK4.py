@@ -36,6 +36,7 @@ class Chassis(rk4.RK4):
     #state variables
     state = Array([], iotype="out")
     #initial mass of vehicle (kg) and velocity (m/s)
+
     state_init = Array([1400, 0], iotype="in")
 
     #external variables
@@ -88,35 +89,50 @@ class Chassis(rk4.RK4):
 
         return f_dot
 
-    # def list_deriv_vars(self): 
-    #     return ('engine_torque',),('acceleration', 'm_dot')
+    def list_deriv_vars(self): 
+        return ('t', 'torque_ratio', 'engine_torque', 'state_init',),('state',)
 
-    # def provideJ(self): 
-    #     pass
+    def df_dy(self, external, state):
+        J = np.zeros((2,2))
 
-    # def apply_deriv(self, arg, result): 
-        
-    #     if 'engine_torque' in arg: 
-    #         result['error'] += arg['current_speed']
-    #         result['norm']  += arg['current_speed']
-    #     if 'target_speed' in arg: 
-    #         result['error'] -= arg['target_speed']
+        m, v = state
+        t, tr, et = external
+
+        J[0,0] = 0
+        J[0,1] = 0
+        J[1,0] = -(et*tr)/ (self.tire_circ/(2.0*pi))/(m**2)
+        J[1,1] = 0
+
+        return J
+
+    def df_dx(self,external,state):
+        J = np.zeros((2,3))
+
+        m, v = state
+        t, tr, et = external
+
+        J[0,0] = -.001
+        J[0,1] = 0
+        J[0,2] = 0
+
+        J[1,0] = 0
+        J[1,1] = (et)/ (self.tire_circ/(2.0*pi))/(m)
+        J[1,2] = (tr)/ (self.tire_circ/(2.0*pi))/(m)
+
+        return J
 
 
-    # def apply_derivT(self, arg, result): 
-        
-    #     if 'current_speed' in result:
-    #         result['current_speed'] += arg['error'] 
-    #         pass
-    #     if 'target_speed' in result: 
-    #         result['target_speed'] -= arg['target_speed']
-    #         pass
+
+
+
 
 if __name__ == '__main__':
 
     trial = Chassis()
 
     trial.run()
+
+    trial.check_gradient()
     
 
     import matplotlib.pyplot as plt

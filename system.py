@@ -12,6 +12,7 @@ from openmdao.lib.drivers.api import SLSQPdriver, NewtonSolver
 
 from chassis_RK4 import Chassis
 from error import Error 
+import time
 
 class System(Assembly):
 
@@ -33,9 +34,9 @@ class System(Assembly):
 if __name__ == '__main__':
 
      trial = set_as_top(System()) 
-
+     t0 = time.clock()
      trial.run()
-
+     print time.clock() - t0, "seconds process time"
      print trial.error.norm
 
 

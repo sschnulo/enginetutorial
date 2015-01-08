@@ -18,7 +18,7 @@ profile = np.genfromtxt('EPA-highway.csv',delimiter=',')
 # t = 764
 
 
-# profile = np.genfromtxt('EPA-city.csv',delimiter=',')
+#profile = np.genfromtxt('EPA-city.csv',delimiter=',')
 # t = 1875
 
 time = np.hstack(([0],profile[:,0]))
@@ -34,7 +34,7 @@ class Error(Component):
     target_speed = Array(new_speed, iotype='in', desc='target velocity')
      
     norm = Float(0.0, iotype='out', desc='norm')
-    error = Array(np.zeros(len(new_speed)), iotype="out")
+   
 
 
     # def __init__(self, target_speed=None):
@@ -48,32 +48,35 @@ class Error(Component):
         
         
         #self.norm = np.linalg.norm([self.current_speed - self.target_speed])
-        self.error = self.current_speed - self.target_speed
-        self.norm = np.linalg.norm([self.error])
+        
+        self.norm = np.linalg.norm([self.current_speed - self.target_speed])**2
 
     def list_deriv_vars(self): 
-        return ('current_speed','target_speed'),('error', 'norm')
+        return ('current_speed','target_speed'),( 'norm',)
 
     def provideJ(self): 
-        pass
+        dnorm_dcurrent_speed = 2 * (self.current_speed-self.target_speed)
+        dnorm_dtarget_speed = 2 * (self.target_speed-self.current_speed)
 
-    def apply_deriv(self, arg, result): 
+        J = array([[dnorm_dcurrent_speed, dnorm_dtarget_speed]])
+
+        return J
+    # def apply_deriv(self, arg, result): 
         
-        if 'current_speed' in arg: 
-            result['error'] += arg['current_speed']
-            result['norm']  += arg['current_speed']
-        if 'target_speed' in arg: 
-            result['error'] -= arg['target_speed']
+    #     if 'current_speed' in arg: 
+    #         result['norm']  = 2 * arg['current_speed-target_speed']
+    #     if 'target_speed' in arg: 
+    #         result['norm'] = 2 * arg['target_speed-current_speed']
 
 
-    def apply_derivT(self, arg, result): 
+    # def apply_derivT(self, arg, result): 
         
-        if 'current_speed' in result:
-            result['current_speed'] += arg['error'] 
-            pass
-        if 'target_speed' in result: 
-            result['target_speed'] -= arg['target_speed']
-            pass
+    #     if 'current_speed' in result:
+    #         result['current_speed'] = arg['(norm/2) + target_speed'] 
+    #         pass
+    #     if 'target_speed' in result: 
+    #         result['target_speed'] = arg['(norm/2) + current_speed']
+    #         pass
 
 if __name__ == '__main__':
 
