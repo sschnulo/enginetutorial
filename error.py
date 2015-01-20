@@ -58,7 +58,7 @@ class Error(Component):
         dnorm_dcurrent_speed = 2 * (self.current_speed-self.target_speed)
         dnorm_dtarget_speed = 2 * (self.target_speed-self.current_speed)
 
-        J = array([[dnorm_dcurrent_speed, dnorm_dtarget_speed]])
+        J = np.hstack((dnorm_dcurrent_speed, dnorm_dtarget_speed)).reshape((1,-1))
 
         return J
     # def apply_deriv(self, arg, result): 

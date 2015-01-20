@@ -27,7 +27,7 @@ class System(Assembly):
         # self.add('driver', NewtonSolver())
         #self.driver.add_constraint('error.error=0')
         
-        self.driver.gradient_options.force_fd = True
+        self.driver.gradient_options.force_fd = False
         self.driver.workflow.add(['chassis', 'error'])
          
 
