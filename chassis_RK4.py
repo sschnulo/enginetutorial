@@ -30,8 +30,6 @@ class Chassis(rk4.RK4):
     
     tire_circ = Float(1.905, iotype='in', units='m', 
                            desc='Circumference of tire')
-    acceleration = Float(0., iotype='out', units='m/(s*s)', 
-                              desc='Vehicle acceleration ') 
 
     #state variables
     state = Array([], iotype="out")
@@ -90,7 +88,7 @@ class Chassis(rk4.RK4):
         return f_dot
 
     def list_deriv_vars(self): 
-        return ('t', 'torque_ratio', 'engine_torque', 'state_init',),('state',)
+        return ("t", "torque_ratio", "engine_torque", "state_init",),("state",)
 
     def df_dy(self, external, state):
         J = np.zeros((2,2))
