@@ -17,8 +17,6 @@ import rk4
 
 class Chassis(rk4.RK4):
 
-
-
     Cf = Float(0.035, iotype='in', 
                     desc='Friction Coefficient (multiplies W)')
     Cd = Float(0.3, iotype='in', 
@@ -33,8 +31,9 @@ class Chassis(rk4.RK4):
 
     #state variables
     state = Array([], iotype="out")
-    #initial mass of vehicle (kg) and velocity (m/s)
 
+
+    #initial mass of vehicle (kg) and velocity (m/s)
     state_init = Array([1400, 0], iotype="in")
 
     #external variables
@@ -52,7 +51,6 @@ class Chassis(rk4.RK4):
         self.t = np.arange(0, end_time+h, h)
         self.torque_ratio = np.ones(len(self.t))
         self.engine_torque = 200* np.ones(len(self.t))
-        #self.engine_torque =  200*np.sin(np.linspace(0, 2*np.pi, len(self.t)))
         self.state=np.zeros((2,len(self.t)))
 
 
@@ -72,18 +70,12 @@ class Chassis(rk4.RK4):
 
         torque = engine_torque*torque_ratio
         tire_radius = self.tire_circ/(2.0*pi)
-        friction = self.Cf*mass*9.8
-        drag = .5*(1.225)*self.Cd*self.area*V*V
 
-        #print sign_V*(friction +drag), V, sign_V
-
-        
-        #acceleration = (torque/tire_radius - sign_V*(friction +drag))/mass
-        acceleration = (torque/tire_radius)/mass
+        acceleration = (torque/tire_radius )/mass 
+        # print acceleration, torque/tire_radius, drag, friction, mass 
         m_dot = -0.001*t  #fuel burn rate (kg/s)
 
         f_dot = np.array([m_dot, acceleration])
-
 
         return f_dot
 
@@ -130,7 +122,7 @@ if __name__ == '__main__':
 
     trial.run()
 
-    trial.check_gradient()
+    # trial.check_gradient()
     
 
     import matplotlib.pyplot as plt
